@@ -7,45 +7,132 @@
 
   <!-- Leaflet CSS for map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Custom CSS -->
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: #f5f5f5;
     }
     header {
       background-color: #0d6efd;
       color: white;
-      padding: 20px;
       text-align: center;
+      padding: 25px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    nav {
+      margin-top: 10px;
+    }
+    nav button {
+      background-color: #ffc107;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    nav button:hover {
+      background-color: #e0a800;
     }
     section {
+      padding: 30px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    h2 {
+      color: #0d6efd;
+      margin-bottom: 15px;
+    }
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .service-card {
+      background-color: white;
       padding: 20px;
+      border-radius: 10px;
+      flex: 1 1 200px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .service-card:hover {
+      transform: translateY(-5px);
     }
     #map {
       height: 400px;
       width: 100%;
       margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     form {
       max-width: 500px;
       margin: auto;
       display: flex;
       flex-direction: column;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     form input, form button {
-      padding: 10px;
-      margin: 5px 0;
+      padding: 12px;
+      margin: 8px 0;
       font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
     form button {
       background-color: #0d6efd;
       color: white;
       border: none;
       cursor: pointer;
+      transition: background 0.3s;
     }
     form button:hover {
       background-color: #084298;
+    }
+
+    /* Modal Styles */
+    #emergency-modal {
+      display: none;
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+    #emergency-modal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+    }
+    #emergency-modal .modal-content h3 {
+      margin-top: 0;
+    }
+    #emergency-modal button.close-btn {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+    #emergency-modal button.close-btn:hover {
+      background: #a71d2a;
     }
   </style>
 </head>
@@ -53,24 +140,30 @@
 
   <header>
     <h1>Vehicle Breakdown Assistance</h1>
+    <nav>
+      <button onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Services</button>
+      <button onclick="document.getElementById('map-section').scrollIntoView({behavior:'smooth'})">Locate Us</button>
+      <button onclick="document.getElementById('request-section').scrollIntoView({behavior:'smooth'})">Request Service</button>
+      <button id="emergency-btn">🚨 Request Emergency Service</button>
+    </nav>
   </header>
 
-  <section>
+  <section id="services">
     <h2>Our Services</h2>
-    <ul>
-      <li>Bike Repair</li>
-      <li>Car Towing</li>
-      <li>Battery Jumpstart</li>
-      <li>Fuel Delivery</li>
-    </ul>
+    <div class="services">
+      <div class="service-card">Bike Repair</div>
+      <div class="service-card">Car Towing</div>
+      <div class="service-card">Battery Jumpstart</div>
+      <div class="service-card">Fuel Delivery</div>
+    </div>
   </section>
 
-  <section>
+  <section id="map-section">
     <h2>Locate Us</h2>
     <div id="map"></div>
   </section>
 
-  <section>
+  <section id="request-section">
     <h2>Request Service</h2>
     <form name="service-request" method="POST" data-netlify="true">
       <input type="hidden" name="form-name" value="service-request">
@@ -81,17 +174,37 @@
     </form>
   </section>
 
+  <!-- Emergency Modal -->
+  <div id="emergency-modal">
+    <div class="modal-content">
+      <h3>Emergency Request</h3>
+      <form name="emergency-request" method="POST" data-netlify="true">
+        <input type="hidden" name="form-name" value="emergency-request">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="service" placeholder="Service Needed" required>
+        <button type="submit">Submit Emergency Request</button>
+      </form>
+      <button class="close-btn" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
   <!-- Leaflet JS for map -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     // Initialize Leaflet map
-    var map = L.map('map').setView([19.0760, 72.8777], 12); // Mumbai coordinates
+    var map = L.map('map').setView([19.0760, 72.8777], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
     L.marker([19.0760, 72.8777]).addTo(map)
       .bindPopup('We are here!')
       .openPopup();
+
+    // Emergency Modal
+    const modal = document.getElementById('emergency-modal');
+    document.getElementById('emergency-btn').onclick = () => modal.style.display = 'flex';
+    function closeModal() { modal.style.display = 'none'; }
   </script>
 
 </body>
