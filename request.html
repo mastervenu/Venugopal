@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Request Service</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+padding:40px;
+}
+
+form{
+background:white;
+padding:30px;
+width:350px;
+margin:auto;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+}
+
+input,select,button{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+
+button{
+background:red;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+.location-btn{
+background:#007bff;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🚗 Vehicle Breakdown Assistance</h1>
+
+<form id="serviceForm">
+
+<input type="text" placeholder="Your Name" id="name" required>
+
+<input type="text" placeholder="Phone Number" id="phone" required>
+
+<select id="service">
+<option>Bike Repair</option>
+<option>Car Towing</option>
+<option>Battery Jumpstart</option>
+<option>Fuel Delivery</option>
+</select>
+
+<input type="text" placeholder="Location" id="location" readonly>
+
+<button type="button" class="location-btn" onclick="getLocation()">📍 Detect My Location</button>
+
+<button type="submit">🚨 Request Emergency Service</button>
+
+</form>
+
+<script>
+
+// GET GPS LOCATION
+
+function getLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+let lat = position.coords.latitude
+let lon = position.coords.longitude
+
+document.getElementById("location").value = lat + "," + lon
+
+})
+
+}else{
+
+alert("Geolocation not supported")
+
+}
+
+}
+
+
+
+// SEND REQUEST
+
+document.getElementById("serviceForm").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+const data={
+
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value,
+service:document.getElementById("service").value,
+location:document.getElementById("location").value
+
+}
+
+fetch("http://localhost:5000/request-service",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(data)
+
+})
+
+.then(res=>res.text())
+.then(data=>{
+
+alert(data)
+
+})
+
+})
+
+</script>
+
+</body>
+</html>
