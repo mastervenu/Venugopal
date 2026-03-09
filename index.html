@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Breakdown Assistance</title>
+
+  <!-- Leaflet CSS for map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    section {
+      padding: 20px;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    form input, form button {
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    form button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #084298;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Vehicle Breakdown Assistance</h1>
+  </header>
+
+  <section>
+    <h2>Our Services</h2>
+    <ul>
+      <li>Bike Repair</li>
+      <li>Car Towing</li>
+      <li>Battery Jumpstart</li>
+      <li>Fuel Delivery</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Locate Us</h2>
+    <div id="map"></div>
+  </section>
+
+  <section>
+    <h2>Request Service</h2>
+    <form name="service-request" method="POST" data-netlify="true">
+      <input type="hidden" name="form-name" value="service-request">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="service" placeholder="Service Needed" required>
+      <button type="submit">Submit Request</button>
+    </form>
+  </section>
+
+  <!-- Leaflet JS for map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Initialize Leaflet map
+    var map = L.map('map').setView([19.0760, 72.8777], 12); // Mumbai coordinates
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    L.marker([19.0760, 72.8777]).addTo(map)
+      .bindPopup('We are here!')
+      .openPopup();
+  </script>
+
+</body>
+</html>
