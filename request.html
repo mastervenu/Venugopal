@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <title>Request Service</title>
 
 <style>
@@ -8,34 +10,49 @@
 body{
 font-family:Arial;
 background:#f4f4f4;
-text-align:center;
-padding:40px;
+margin:0;
 }
 
-form{
+.container{
+width:400px;
+margin:60px auto;
 background:white;
 padding:30px;
-width:350px;
-margin:auto;
 border-radius:10px;
 box-shadow:0 0 10px gray;
 }
 
-input,select,button{
+h2{
+text-align:center;
+}
+
+input,select{
 width:100%;
 padding:10px;
-margin:10px 0;
+margin-top:10px;
+margin-bottom:20px;
+border:1px solid #ccc;
+border-radius:5px;
 }
 
 button{
-background:red;
-color:white;
+width:100%;
+padding:12px;
 border:none;
+border-radius:5px;
+font-size:16px;
 cursor:pointer;
 }
 
 .location-btn{
 background:#007bff;
+color:white;
+margin-bottom:10px;
+}
+
+.request-btn{
+background:red;
+color:white;
 }
 
 </style>
@@ -44,32 +61,36 @@ background:#007bff;
 
 <body>
 
-<h1>🚗 Vehicle Breakdown Assistance</h1>
+<div class="container">
 
-<form id="serviceForm">
+<h2>🚗 Request Breakdown Service</h2>
 
-<input type="text" placeholder="Your Name" id="name" required>
-
-<input type="text" placeholder="Phone Number" id="phone" required>
+<label>Select Service</label>
 
 <select id="service">
+
 <option>Bike Repair</option>
 <option>Car Towing</option>
 <option>Battery Jumpstart</option>
 <option>Fuel Delivery</option>
+
 </select>
 
-<input type="text" placeholder="Location" id="location" readonly>
+<label>Your Location</label>
 
-<button type="button" class="location-btn" onclick="getLocation()">📍 Detect My Location</button>
+<input type="text" id="location" placeholder="Click detect location">
 
-<button type="submit">🚨 Request Emergency Service</button>
+<button class="location-btn" onclick="getLocation()">
+📍 Detect My Location
+</button>
 
-</form>
+<button class="request-btn" onclick="sendRequest()">
+🚨 Request Emergency Service
+</button>
+
+</div>
 
 <script>
-
-// GET GPS LOCATION
 
 function getLocation(){
 
@@ -92,20 +113,15 @@ alert("Geolocation not supported")
 
 }
 
+function sendRequest(){
 
+let service = document.getElementById("service").value
+let location = document.getElementById("location").value
 
-// SEND REQUEST
+if(location==""){
 
-document.getElementById("serviceForm").addEventListener("submit",function(e){
-
-e.preventDefault()
-
-const data={
-
-name:document.getElementById("name").value,
-phone:document.getElementById("phone").value,
-service:document.getElementById("service").value,
-location:document.getElementById("location").value
+alert("Please detect your location first")
+return
 
 }
 
@@ -117,20 +133,32 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify(data)
+body:JSON.stringify({
+service:service,
+location:location,
+time:new Date()
+})
 
 })
 
-.then(res=>res.text())
+.then(res=>res.json())
+
 .then(data=>{
 
-alert(data)
+alert("Service Request Sent Successfully")
 
 })
 
+.catch(error=>{
+
+alert("Server not running")
+
 })
+
+}
 
 </script>
 
 </body>
+
 </html>
