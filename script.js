@@ -1,59 +1,45 @@
-let map
+const express = require("express")
+const cors = require("cors")
+const fs = require("fs")
 
-function initMap(){
+const app = express()
 
-map = new google.maps.Map(document.getElementById("map"),{
+app.use(cors())
+app.use(express.json())
 
-center:{lat:11.0168,lng:76.9558},
-zoom:12
+// GET all requests
+app.get("/requests", (req,res)=>{
 
-})
+let data = JSON.parse(fs.readFileSync("data.json"))
 
-}
-
-function getLocation(){
-
-navigator.geolocation.getCurrentPosition(function(position){
-
-let lat = position.coords.latitude
-let lon = position.coords.longitude
-
-document.getElementById("location").value = lat + "," + lon
-
-map.setCenter({lat:lat,lng:lon})
-
-new google.maps.Marker({
-
-position:{lat:lat,lng:lon},
-map:map
+res.json(data)
 
 })
 
+// SAVE service request
+app.post("/request-service",(req,res)=>{
+
+let requests = JSON.parse(fs.readFileSync("data.json"))
+
+const newRequest = {
+
+id: Date.now(),
+name:req.body.name,
+phone:req.body.phone,
+service:req.body.service,
+location:req.body.location,
+status:"Pending"
+
+}
+
+requests.push(newRequest)
+
+fs.writeFileSync("data.json",JSON.stringify(requests,null,2))
+
+res.send("Service Request Submitted")
+
 })
 
-}
-
-function submitRequest(){
-
-let data = {
-
-name:document.getElementById("name").value,
-vehicle:document.getElementById("vehicle").value,
-service:document.getElementById("service").value,
-problem:document.getElementById("problem").value,
-location:document.getElementById("location").value
-
-}
-
-fetch("http://localhost:3000/request",{
-
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(data)
-
+app.listen(5000,()=>{
+console.log("Server running on port 5000")
 })
-
-.then(res=>res.text())
-.then(data=>alert(data))
-
-}
