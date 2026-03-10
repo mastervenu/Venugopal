@@ -2,70 +2,15 @@
 <html>
 
 <head>
-
 <title>Request Service</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#f4f4f4;
-margin:0;
-}
-
-.container{
-width:400px;
-margin:60px auto;
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 0 10px gray;
-}
-
-h2{
-text-align:center;
-}
-
-input,select{
-width:100%;
-padding:10px;
-margin-top:10px;
-margin-bottom:20px;
-border:1px solid #ccc;
-border-radius:5px;
-}
-
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:5px;
-font-size:16px;
-cursor:pointer;
-}
-
-.location-btn{
-background:#007bff;
-color:white;
-margin-bottom:10px;
-}
-
-.request-btn{
-background:red;
-color:white;
-}
-
-</style>
-
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+<div class="form">
 
-<h2>🚗 Request Breakdown Service</h2>
-
-<label>Select Service</label>
+<h2>Request Breakdown Service</h2>
 
 <select id="service">
 
@@ -76,89 +21,26 @@ color:white;
 
 </select>
 
-<label>Your Location</label>
+<input type="text" id="location" placeholder="Enter Location">
 
-<input type="text" id="location" placeholder="Click detect location">
-
-<button class="location-btn" onclick="getLocation()">
-📍 Detect My Location
-</button>
-
-<button class="request-btn" onclick="sendRequest()">
-🚨 Request Emergency Service
-</button>
+<button onclick="sendRequest()">Request Service</button>
 
 </div>
 
 <script>
-
-function getLocation(){
-
-if(navigator.geolocation){
-
-navigator.geolocation.getCurrentPosition(function(position){
-
-let lat = position.coords.latitude
-let lon = position.coords.longitude
-
-document.getElementById("location").value = lat + "," + lon
-
-})
-
-}else{
-
-alert("Geolocation not supported")
-
-}
-
-}
-
 function sendRequest(){
 
 let service = document.getElementById("service").value
 let location = document.getElementById("location").value
 
-if(location==""){
-
-alert("Please detect your location first")
+if(location === ""){
+alert("Please enter location")
 return
-
 }
 
-fetch("http://localhost:5000/request-service",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-service:service,
-location:location,
-time:new Date()
-})
-
-})
-
-.then(res=>res.json())
-
-.then(data=>{
-
-alert("Service Request Sent Successfully")
-
-})
-
-.catch(error=>{
-
-alert("Server not running")
-
-})
+alert("Service Requested!\nService: " + service + "\nLocation: " + location)
 
 }
-
 </script>
-
 </body>
-
 </html>
